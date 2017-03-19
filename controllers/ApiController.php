@@ -182,4 +182,60 @@ class ApiController extends Controller
             'originalWebsiteUrl' => $originalWebsiteUrl,
         ];
     }
+
+    public function actionSimilarity($query) {
+        $broken_down = preg_split("/ +/", $query);
+        $similarity_score = array();
+        $query_formatted = preg_replace("/ +/", "+", $query);
+        $url_base = "https://www.googleapis.com/customsearch/v1?q=";
+        $url_custom_key = "&cx=003325682632509586946%3Aqs5_o_akoyc";
+        $api_key = "&key=AIzaSyB7IyBHpgbElcGs4jeIRotuySpk2aewaTA";
+        $full_call = $url_base . $query_formatted . $url_custom_key . $api_key;
+        $http_client = new Client();
+        $response = $http_client->get($full_call)->getBody()->getContents();
+        $json_response = Json::decode($response);
+        //$response_material = $json_response['items'][0]['pagemap']['newsarticle'];
+        $response_items = array();
+        $counter = 0;
+        $score = 0;
+        if(isset($json_response['items'])) {
+            foreach ($json_response['items'] as $item) {
+                foreach ($item['pagemap']['newsarticle'] as $newsarticle) {
+                    if (isset($newsarticle['headline'])) {
+                        array_push($response_items, $newsarticle['headline']);
+                    } else if (isset($newsarticle['name'])) {
+                        array_push($response_items, $newsarticle['name']);
+                    }
+                    $counter += 1;
+                    if ($counter >= 10) break;
+                }
+                if ($counter >= 10) break;
+            }
+            foreach ($broken_down as $token) {
+                foreach ($response_items as $headline) {
+                    if (strpos($headline, $token) !== false) {
+                        $similarity_score[] = 1;
+                    } else {
+                        $similarity_score[] = 0;
+                    }
+                }
+            }
+            $score = (array_sum($similarity_score)/count($similarity_score))*100;
+            //adjustment, VERY CRUDE
+            $score = $score + (100-$score)/2;
+            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            return [
+                'foundSimilarities' => count($response_items)!=0,
+                'score' => $score,
+                'similarArticles' => $response_items
+            ];
+        } else {
+            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            return [
+                'foundSimilarities' => false,
+                'score' => 0,
+                'similarArticles' => ''
+            ];
+        }
+    }
 }
