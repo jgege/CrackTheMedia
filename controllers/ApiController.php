@@ -22,23 +22,24 @@ class ApiController extends Controller
         ];
     }
 
-public function behaviors()
-{
-    return [
-        'corsFilter' => [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => ['*'],
-                'Access-Control-Request-Method' => ['GET'],
-                'Access-Control-Request-Headers' => ['X-Wsse'],
-                'Access-Control-Allow-Credentials' => true,
-                'Access-Control-Max-Age' => 3600,
-                'Access-Control-Expose-Headers' => ['X-Pagination-Current-Page'],
-            ],
+    public function behaviors()
+    {
+        return [
+            'corsFilter' => [
+                'class' => \yii\filters\Cors::className(),
+                'cors' => [
+                    'Origin' => ['*'],
+                    'Access-Control-Request-Method' => ['GET'],
+                    'Access-Control-Request-Headers' => ['X-Wsse'],
+                    'Access-Control-Allow-Credentials' => true,
+                    'Access-Control-Max-Age' => 3600,
+                    'Access-Control-Expose-Headers' => ['X-Pagination-Current-Page'],
+                ],
 
-        ],
-    ];
-}
+            ],
+        ];
+    }
+
     public function actionIndex($s)
     {
         $this->enableCsrfValidation = false;
