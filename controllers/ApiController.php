@@ -22,14 +22,33 @@ class ApiController extends Controller
         ];
     }
 
+public function behaviors()
+{
+    return [
+        'corsFilter' => [
+            'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                'Origin' => ['*'],
+                'Access-Control-Request-Method' => ['GET'],
+                'Access-Control-Request-Headers' => ['X-Wsse'],
+                'Access-Control-Allow-Credentials' => true,
+                'Access-Control-Max-Age' => 3600,
+                'Access-Control-Expose-Headers' => ['X-Pagination-Current-Page'],
+            ],
+
+        ],
+    ];
+}
     public function actionIndex($s)
     {
         $this->enableCsrfValidation = false;
         $apiKey = 'AIzaSyADwBff-ITox3I4QB0ZOcxguJu3vPGVB5g';
 
+        $keyword = parse_url($s, PHP_URL_HOST);
+
         $baseUrl = 'https://kgsearch.googleapis.com/v1/entities:search';
         $params = [
-          'query' => $s,
+          'query' => $keyword,
           'limit' => 10,
           'indent' => TRUE,
           'key' => $apiKey];
@@ -42,7 +61,6 @@ class ApiController extends Controller
         } catch (ClientException $e) {
             $msg = $e->getRequest();
             return null;
-            //var_dump($msg);
         }
 
         $contentJson = \yii\helpers\Json::decode($content);
@@ -62,23 +80,18 @@ class ApiController extends Controller
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if (!$isOrganization) {
             return [
-                'keyword' => $s,
+                'keyword' => $keyword,
                 'isOrganization' => false,
             ];
         }
 
         return [
-            'keyword' => $s,
+            'keyword' => $keyword,
             'name' => $name,
             'desc' => $desc,
             'image' => $imageUrl,
             'isOrganization' => true,
         ];
-
-        // $contentJson['itemListElement'][0]['result']['type'] // array
-        // $contentJson['itemListElement'][0]['result']['name'] //
-        // $contentJson['itemListElement'][0]['result']['description'] //
-        exit();
     }
 
     public function actionImage()
