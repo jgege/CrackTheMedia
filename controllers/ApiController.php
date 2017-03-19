@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use GuzzleHttp\Client;
@@ -29,10 +30,10 @@ class ApiController extends Controller
 
         $baseUrl = 'https://kgsearch.googleapis.com/v1/entities:search';
         $params = [
-          'query' => $s,
-          'limit' => 10,
-          'indent' => TRUE,
-          'key' => $apiKey];
+            'query' => $s,
+            'limit' => 10,
+            'indent' => TRUE,
+            'key' => $apiKey];
         $url = $baseUrl . '?' . http_build_query($params);
 
         $httpClient = new Client;
@@ -168,4 +169,50 @@ class ApiController extends Controller
             'originalWebsiteUrl' => $originalWebsiteUrl,
         ];
     }
+
+    public function actionSimilarity($query) {
+
+        $broken_down = array();
+        $broken_down = preg_split("/ +/", $query);
+        $query_formatted = preg_replace("/ +/", "+", $query);
+
+        $url_base = "https://www.googleapis.com/customsearch/v1?q=";
+        $url_custom_key = "&cx=003325682632509586946%3Aqs5_o_akoyc";
+        $api_key = "&key=AIzaSyB7IyBHpgbElcGs4jeIRotuySpk2aewaTA";
+
+        $full_call = $url_base . $query_formatted . $url_custom_key . $api_key;
+
+        $http_client = new Client();
+        $response = $http_client->get($full_call)->getBody()->getContents();
+        $json_response = Json::decode($response);
+
+
+
+        //$response_material = $json_response['items'][0]['pagemap']['newsarticle'];
+        $response_items = array();
+        $counter = 0;
+        foreach ($json_response['items'] as $item) {
+
+                foreach($item['pagemap']['newsarticle'] as $newsarticle) {
+                    if(isset($newsarticle['headline'])) {
+                        array_push($response_items, $newsarticle['headline']);
+                    } else if (isset($newsarticle['name'])) {
+                        array_push($response_items, $newsarticle['name']);
+                    }
+                    $counter+=1;
+                    if($counter >= 10) break;
+                }
+            if($counter >= 10) break;
+        }
+
+        // var_dump($response_items);
+
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        return [
+            'foundSimilarities' => count($response_items)!=0,
+            'similarArticles' => $response_items
+        ];
+
+    }
+
 }
