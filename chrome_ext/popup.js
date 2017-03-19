@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
     * Knowledge search
     */
-    var url = "http://crackthemedia.ml/gege/api/index?s=" + encodeURIComponent(currentTabUrl);
+    var url = "http://crackthemedia.ml/gege/api/index?query=" + encodeURIComponent(currentTabUrl);
     var xhr = new XMLHttpRequest();
 
     xhr.open("GET", url, false);
