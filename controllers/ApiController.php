@@ -7,6 +7,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use GuzzleHttp\Client;
+use yii\helpers\Json;
 
 class ApiController extends Controller
 {
@@ -64,7 +65,7 @@ class ApiController extends Controller
             return null;
         }
 
-        $contentJson = \yii\helpers\Json::decode($content);
+        $contentJson = Json::decode($content);
 
         if (!isset($contentJson['itemListElement'], $contentJson['itemListElement'][0], $contentJson['itemListElement'][0]['result'])) {
             return null;
@@ -193,6 +194,7 @@ class ApiController extends Controller
         $full_call = $url_base . $query_formatted . $url_custom_key . $api_key;
         $http_client = new Client();
         $response = $http_client->get($full_call)->getBody()->getContents();
+
         $json_response = Json::decode($response);
         //$response_material = $json_response['items'][0]['pagemap']['newsarticle'];
         $response_items = array();
