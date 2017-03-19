@@ -140,7 +140,7 @@ class ApiController extends Controller
         $imageList = $content['responses'][0]['webDetection']['fullMatchingImages'];
         $webpageList = $content['responses'][0]['webDetection']['pagesWithMatchingImages'];
 
-        $originalImageResponse = $httpClient->get($url);
+        $originalImageResponse = $httpClient->get($query);
         $originalLastModDate = $originalImageResponse->getHeader('Last-Modified');
         $originalLastModDate = $originalLastModDate[0];
         $originalLastModDateTimestamp = strtotime($originalLastModDate);
@@ -149,7 +149,7 @@ class ApiController extends Controller
             return null;
         }
 
-        $oldestImageUrl = $url;
+        $oldestImageUrl = $query;
         $oldestLastModDateTimestamp = $originalLastModDateTimestamp;
         $originalIsOldest = true;
         $originalWebsiteUrl = null;
