@@ -41,12 +41,12 @@ class ApiController extends Controller
         ];
     }
 
-    public function actionIndex($s)
+    public function actionIndex($query)
     {
         $this->enableCsrfValidation = false;
         $apiKey = 'AIzaSyADwBff-ITox3I4QB0ZOcxguJu3vPGVB5g';
 
-        $keyword = parse_url($s, PHP_URL_HOST);
+        $keyword = parse_url($query, PHP_URL_HOST);
 
         $baseUrl = 'https://kgsearch.googleapis.com/v1/entities:search';
         $params = [
@@ -95,13 +95,10 @@ class ApiController extends Controller
         ];
     }
 
-    public function actionImage()
+    public function actionImage($query)
     {
         $apiKey = 'AIzaSyADwBff-ITox3I4QB0ZOcxguJu3vPGVB5g';
         $cvurl = "https://vision.googleapis.com/v1/images:annotate?key=" . $apiKey;
-
-        //$url = 'http://ichef-1.bbci.co.uk/news/624/cpsprodpb/2243/production/_95217780_60ce91f2-f679-4d92-95b9-9a0dab5430e3.jpg';
-        $url = 'https://888-s3.s3.eu-central-1.amazonaws.com/thumbs/2017-03-18/dfe56fabd49f2264eb9c8664cd823cbd/web760.jpeg';
 
         $data = '{
   "requests":
@@ -111,7 +108,7 @@ class ApiController extends Controller
       {
         "source":
         {
-          "imageUri": "' . $url . '"
+          "imageUri": "' . $query . '"
         }
       },
       "features":
