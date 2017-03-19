@@ -50,8 +50,8 @@ class ApiController extends Controller
 
         $baseUrl = 'https://kgsearch.googleapis.com/v1/entities:search';
         $params = [
-          'query' => $keyword,
-          'limit' => 10,
+          'query' => 'http://'.$keyword,
+          'limit' => 1,
           'indent' => TRUE,
           'key' => $apiKey];
         $url = $baseUrl . '?' . http_build_query($params);
@@ -61,7 +61,6 @@ class ApiController extends Controller
             $request = $httpClient->get($url, ['allow_redirects' => false]);
             $content = ($request->getBody()->getContents());
         } catch (ClientException $e) {
-            $msg = $e->getRequest();
             return null;
         }
 
@@ -73,10 +72,10 @@ class ApiController extends Controller
 
         $firstResult = $contentJson['itemListElement'][0]['result'];
 
-        $name = $firstResult['name'];
-        $desc = $firstResult['description'];
-        $type = $firstResult['@type'];
-        $imageUrl = $firstResult['image']['contentUrl'];
+        $name = (isset($firstResult['name']))? $firstResult['name'] :  '';
+        $desc = (isset($firstResult['description']))? $firstResult['description'] : '';
+        $type = (isset($firstResult['@type']))? $firstResult['@type'] : '';
+        $imageUrl = (isset($firstResult['image']['contentUrl']))? $firstResult['image']['contentUrl'] : '';
         $isOrganization = in_array('Organization', $type);
 
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

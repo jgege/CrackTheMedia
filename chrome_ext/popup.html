@@ -12,29 +12,27 @@
         font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
         font-size: 100%;
       }
-      #status {
-        white-space: pre;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 400px;
-      }
     </style>
 
     <script src="popup.js"></script>
   </head>
   <body>
-    <p>You are looking at</p>
-    <div id="cont_icon">
-      <img id="icon" />
+    <div id="baseinfo-wrapper">
+      <p>You are looking at</p>
+      <div id="cont_icon">
+        <img id="icon" />
+      </div>
+      <div id="cont_name">-</div>
+      <div id="cont_description"></div>
+      <div id="cont_is_organization"></div>
     </div>
-    <div id="cont_name"></div>
-    <div id="cont_description"></div>
-    <div id="cont_is_organization"></div>
 
-    <div>
+    <div id="article-wrapper">
       <p>Article</p>
       <div id="is_similar_cont"></div>
       <div>Score <span id="similarity_score_cont"></span></div>
     </div>
+
+    <div id="noinfo-wrapper">No information found.</div>
   </body>
 </html>

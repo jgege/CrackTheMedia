@@ -15,8 +15,19 @@ function getCurrentTabUrlAndTitle(callback) {
   });
 }
 
+function showElement(element) {
+  element.style.display = 'block';
+}
+
+function hideElement(element) {
+  element.style.display = 'none';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   getCurrentTabUrlAndTitle(function(currentTabUrl, title) {
+    hideElement(document.getElementById('baseinfo-wrapper'));
+    hideElement(document.getElementById('article-wrapper'));
+
     /**
     * Knowledge search
     */
@@ -28,17 +39,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var result = xhr.responseText;
     var responseJson = JSON.parse(result);
+
+    if (responseJson && responseJson.isOrganization) {
+      console.log('Base info OK');
+      showElement(document.getElementById('baseinfo-wrapper'));
+      hideElement(document.getElementById('noinfo-wrapper'));
+      var iconObj = document.getElementById("icon");
+      var nameObj = document.getElementById("cont_name");
+      var isOrgObj = document.getElementById("cont_is_organization");
+      var descObj = document.getElementById("cont_description");
+
+      iconObj.src = responseJson['image'];
+      nameObj.innerHTML = responseJson['name'];
+      descObj.innerHTML = responseJson['desc'];
+      isOrgObj.innerHTML = (responseJson['isOrganization']) ? 'Organization' : 'Not an organization';
+    }
     
-    var iconObj = document.getElementById("icon");
-    var nameObj = document.getElementById("cont_name");
-    var isOrgObj = document.getElementById("cont_is_organization");
-    var descObj = document.getElementById("cont_description");
-
-    iconObj.src = responseJson['image'];
-    nameObj.innerHTML = responseJson['name'];
-    descObj.innerHTML = responseJson['desc'];
-    isOrgObj.innerHTML = (responseJson['isOrganization']) ? 'Organization' : 'Not an organization';
-
     /**
     * Similarity check
     */
@@ -51,12 +67,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var result = xhr.responseText;
     var responseJson = JSON.parse(result);
 
-    var isSimilarObj = document.getElementById("is_similar_cont");
-    var similarityScorebj = document.getElementById("similarity_score_cont");
-    
-    isSimilarObj.innerHTML = (responseJson['foundSimilarities']) ? "Found similarities" : "Couldn't find similarities";
-    similarityScorebj.innerHTML = responseJson['score'];
-
-    console.log(responseJson);
+    if (responseJson) {
+      console.log('Article OK');
+      showElement(document.getElementById('article-wrapper'));
+      hideElement(document.getElementById('noinfo-wrapper'));
+      var isSimilarObj = document.getElementById("is_similar_cont");
+      var similarityScorebj = document.getElementById("similarity_score_cont");
+      
+      isSimilarObj.innerHTML = (responseJson['foundSimilarities']) ? "Found similarities" : "Couldn't find similarities";
+      similarityScorebj.innerHTML = responseJson['score'];
+    }
   });
 });
